@@ -1,0 +1,38 @@
+services: 
+
+    crm_app:
+      links: 
+        - mysql_db:mysql
+      container_name: crm_app
+      build: .
+      volumes:
+        - ./backend:/var/www/html
+        - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+      networks:
+        - app-network
+      ports:
+        - 9000:80
+      depends_on:
+        - mysql_db
+
+    mysql_db:
+      image: mysql:latest
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: CRM
+      ports:
+        - 3306:3306
+      volumes:
+        - dbdata:/var/lib/mysql/
+        - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
+      networks:
+        - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+#Volumes
+volumes:
+  dbdata:
+    driver: local
